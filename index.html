@@ -1,0 +1,64 @@
+<html>
+<!-- Instruction
+This is a simple script to process upload file
+Full function will be 
+1.upload a txt file
+2.do some transformation
+3.download result as csv
+-->
+
+<body>
+<!-- user interface begins -->
+<div>
+    <input type="file" id="files" name="files[]" multiple />
+    <output id="list"></output>
+</div>
+<!-- user interface ends -->
+   
+<script type="text/javascript">
+  function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f; f = files[i]; i++) {
+
+      var reader = new FileReader();
+     
+      // Closure to capture the file information.
+      reader.onload = (function(theFile) {
+        return function(e) {
+          // Render thumbnail.
+          var span = document.createElement('span');
+          var results=e.target.result.split('\n');
+          //span.innerHTML = ['<p>', results.split('\n')[0]+' break '+results.split('\n')[1]+' break '+results.split('\n')[2],'</p>'].join('');
+          var finalResult='';
+          var scenairo='';
+
+          for(var i=0;i<results.length;i++){   //file process row by row
+            if(results[i].startsWith('Scenario')) {
+                scenairo=results[i].substr(10);
+            //finalResult+='<br>'+'"'+scenairo+'",';
+            }
+            else if(results[i].startsWith('Given')){
+              finalResult+='<br>'+'"'+scenairo+'",'+'"'+results[i]+'"';
+            }
+            else if(results[i].startsWith('And')){
+              finalResult+=' '+results[i]+',';
+            }
+            else
+              finalResult+=',"'+results[i]+'"';
+          }
+
+          span.innerHTML = ['<p>',finalResult,'</p>'].join('');
+          document.getElementById('list').insertBefore(span, null);
+        };
+      })(f);
+
+    reader.readAsText(f);
+    }
+  }
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+</body>
+</html>
