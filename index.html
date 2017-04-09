@@ -10,6 +10,7 @@ history:
 date(dd/mm/yyyy)          Name            description
 04/04/2017                Wade            initial version, can upload a file and transform and display result in web
 09/04/2017                Wade            add textarea to paste context; add csv file download function(exportCSV)
+09/04/2017                Wade            take contentTransform out from each handle function
 -->
 <head>
 <style>
@@ -44,22 +45,7 @@ date(dd/mm/yyyy)          Name            description
           var span = document.createElement('span');
           var results=e.target.result.split('\n');
           //span.innerHTML = ['<p>', results.split('\n')[0]+' break '+results.split('\n')[1]+' break '+results.split('\n')[2],'</p>'].join('');
-          var finalResult='';
-          var scenairo='';
-          for(var i=0;i<results.length;i++){   //file process row by row
-            if(results[i].startsWith('Scenario')) {
-                scenairo=results[i].substr(10);
-            //finalResult+='<br>'+'"'+scenairo+'",';
-            }
-            else if(results[i].startsWith('Given')){
-              finalResult+='<br>'+'"'+scenairo+'",'+'"'+results[i]+'"';
-            }
-            else if(results[i].startsWith('And')){
-              finalResult+=' '+results[i]+',';
-            }
-            else
-              finalResult+=',"'+results[i]+'"';
-          }
+          var finalResult=contentTransform1(results);
           span.innerHTML = ['<p>',finalResult,'</p>'].join('');
           document.getElementById('list').insertBefore(span, null);
         };
@@ -73,25 +59,37 @@ date(dd/mm/yyyy)          Name            description
     var span = document.createElement('span');
     var results=texts.value.split('\n');
     //span.innerHTML = ['<p>', results.split('\n')[0]+' break '+results.split('\n')[1]+' break '+results.split('\n')[2],'</p>'].join('');
-    var finalResult='';
-    var scenairo='';
-    for(var i=0;i<results.length;i++){   //file process row by row
-      if(results[i].startsWith('Scenario')) {
-          scenairo=results[i].substr(10);
-      //finalResult+='<br>'+'"'+scenairo+'",';
-      }
-      else if(results[i].startsWith('Given')){
-        finalResult+='<br>'+'"'+scenairo+'",'+'"'+results[i]+'"';
-      }
-      else if(results[i].startsWith('And')){
-        finalResult+=' '+results[i]+',';
-      }
-      else
-        finalResult+=',"'+results[i]+'"';
-    }
+    var finalResult=contentTransform1(results);
     span.innerHTML = ['<p>',finalResult,'</p>'].join('');
     document.getElementById('list').insertBefore(span, null);
-     exportCSV(finalResult);
+    exportCSV(finalResult);
+  }
+  
+  function contentTransform1(context){  
+  /*
+    Transform format:
+      if row start with "Scenario: ", 
+      if row start with "Given"
+      if row start with "And"
+      else
+  */
+    var transResult='';
+    var scenairo='';
+    for(var i=0;i<context.length;i++){   //file process row by row
+      if(context[i].startsWith('Scenario')) {
+          scenairo=context[i].substr(10);
+      //transResult+='<br>'+'"'+scenairo+'",';
+      }
+      else if(context[i].startsWith('Given')){
+        transResult+='<br>'+'"'+scenairo+'",'+'"'+context[i]+'"';
+      }
+      else if(context[i].startsWith('And')){
+        transResult+=' '+context[i]+',';
+      }
+      else
+        transResult+=',"'+context[i]+'"';
+    }
+    return transResult;
   }
   
   function exportCSV(inputText){
