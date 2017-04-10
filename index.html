@@ -5,7 +5,6 @@ Full function will be
 1.upload a txt file or paste in text area
 2.do some transformation
 3.download result as csv
-
 history:
 date(dd/mm/yyyy)          Name            description
 04/04/2017                Wade            initial version, can upload a file and transform and display result in web
@@ -93,7 +92,8 @@ date(dd/mm/yyyy)          Name            description
   }
   
   function exportCSV(inputText){
-    var blob = new Blob([inputText], { type: 'text/csv;charset=utf-8;' });
+    var replaceBreak=inputText.replace(/\<br\>/g,'\n');
+    var blob = new Blob([replaceBreak], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, filename);
     } else {
